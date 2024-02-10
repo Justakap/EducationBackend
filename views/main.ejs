@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<div class="container">
+  <h1>Add a Video </h1>
+  <form action="/" method="post">
+    <div class="mb-3"><label class="form-label">Branch</label>
+      <select name="branch" class="form-select" id="">
+        <option value="">Select Branch</option>
+        <option value="Computer Science Engg">Computer Science Engg</option>
+        <option value="Electronics">Electronics</option>
+          </select>
+      <div class="mb-3"><label class="form-label" for="">Semester</label>
+        <select name="semester" class="form-select" id="">
+          <option value="">Select Semester</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+        </select>
+      </div>
+      <div class="mb-3"><label class="form-label" for="">Subject</label>
+        <select name="subject" class="form-select" id="">
+          <option value="">Select Subject</option>
+          <option value="Data Structure and Algorithms">Data Structure and Algorithms</option>
+          <option value="Digital Electronics">Digital Electronics</option>
+          <option value="AEM">AEM</option>
+          <option value="OOPS">OOPS</option>
+        </select>
+      </div>
+        <div class="mb-3"><label class="form-label" for="">Video Number</label>
+          <input class="form-control" type="text" name="count">
+        </div>
+        <div class="mb-3"><label class="form-label" for="">Video Url</label>
+          <input class="form-control" type="text" name="source">
+        </div>
+        <div class="mb-3"><label class="form-label" for="">Notes Url</label>
+          <input class="form-control" type="text" name="notesUrl">
+        </div>
+      <div class="mb-3 form-check"><input class="form-check-input" id="exampleCheck1" type="checkbox"><label
+          class="form-check-label">Check me out</label></div><button class="btn btn-primary"
+        type="submit">Submit</button>
+       
+    </div>
+  </form>
+</div>
