@@ -16,6 +16,7 @@ const { findOne } = require('./models/question')
 const resultModel = require('./models/result')
 const gradeModel = require('./models/grade')
 const unitModel = require('./models/units')
+const resourceModel = require('./models/resources')
 
 
 const app = express()
@@ -28,6 +29,7 @@ const app = express()
 // ))]
 app.use(cors({
     origin: 'https://markeducation.netlify.app',
+    // origin: ["http://localhost:3000"],
     credentials: true,
 }));
 app.use(express.json())
@@ -59,6 +61,11 @@ app.get('/getData', (req, res) => {
 })
 app.get('/branches', (req, res) => {
     branchModel.find()
+        .then(users => res.json(users))
+        .catch(err => res.json(err))
+})
+app.get('/resources', (req, res) => {
+    resourceModel.find()
         .then(users => res.json(users))
         .catch(err => res.json(err))
 })
@@ -198,29 +205,63 @@ app.post('/Modify/Subject/add', async (req, res) => {
 })
 
 //add video 
-app.post('/addResource/addVideo', (req, res) => {
-    const { branch, subject, count, source, notesUrl, pyq } = req.body;
 
-    const video = new vidModel({ branch: branch, subject: subject, count: count, source: source, notesUrl: notesUrl, pyq: pyq })
-    video.save().then(() => {
-        res.status(200).send('Video added successfully!');
-    })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Internal Server Error');
-        });
-})
+app.post('/Modify/Video/Add', async (req, res) => {
+    const { subject, unit, source, notesUrl, comment,branch,semester } = req.body;
+
+    const data = {
+        subject: subject,
+        unit: unit,
+        source: source,
+        notesUrl: notesUrl,
+        comment: comment,
+        branch: branch,
+        semester: semester
+    };
+
+    try {
+        const check = await vidModel.findOne({ source: source });
+
+        if (check) {
+            // Video with the same source already exists
+            return res.json("exist");
+// 
+        } else {
+            // Video does not exist, so insert it
+            await vidModel.create(data);
+            // console.log("Data inserted:", data);
+            return res.json("added");
+        }
+    } catch (error) {
+        console.error("Error inserting data:", error);
+        return res.status(500).json("nadded");
+    }
+});
 //add branch 
-app.post('/addResource/addBranch', (req, res) => {
+app.post('/Modify/Branch', async (req, res) => {
     const { branch, image } = req.body;
-    const branches = new branchModel({ branch: branch, image: image })
-    branches.save().then(() => {
-        res.status(200).send('branch added successfully!');
-    })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Internal Server Error');
-        });
+    const data = {
+        branch: branch,
+        image: image,
+
+    }
+    const check = await branchModel.findOne({ branch: branch });
+
+    if (check) {
+        // Unit with the same number or name already exists
+        res.json("exist");
+    } else {
+        // Unit does not exist, so insert it
+        try {
+            await branchModel.insertMany([data]);
+            // console.log("Data inserted:", data);
+            res.json("added");
+        } catch (error) {
+            console.error("Error inserting data:", error);
+            res.status(500).json("nadded");
+        }
+    }
+
 })
 //add unit 
 app.post('/modify/unit/add', async (req, res) => {
@@ -320,7 +361,7 @@ app.post('/assesment/addQuestion', (req, res) => {
 })
 
 // add assesment
-app.post('/assesment/addAssesment', async (req, res) => {
+app.post('/Modify/Assesment', async (req, res) => {
     const { subject, number, TotalQuestion } = req.body
 
     const data = {

@@ -2,11 +2,13 @@ const mongoose = require('mongoose')
 const vidSchema = new mongoose.Schema({
   branch: String,
   semester: String,
+  // count: String,
   subject: String,
-  count: String,
+  unit: Number,
   source: String,
   notesUrl: String,
-  pyq: String,
+  comment: String,
+  review: Number,
   // other fields...
 });
 
