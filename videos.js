@@ -110,33 +110,32 @@ app.get('/profile', (req, res) => {
 
 
 // post only
-
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
     try {
-        const check = await UserModel.findOne({ email: email })
-        const check2 = await UserModel.findOne({ email: email, password: password })
-        if (check) {
-            if (check2) {
-                req.session.username = email;
-                console.log(req.session.username)
-                res.json({ login: true, username: req.session.username })
-            }
-            else if (!check2) {
-                res.json("incorrect")
-            }
-        }
-        else {
+        const user = await UserModel.findOne({ email: email });
 
-            res.json("notexist")
-        }
+        if (user) {
+            // Check if the password matches
+            if (user.password === password) {
 
+                // Respond with JSON data containing user's information
+                res.json({ auth: true, user: user });
+            } else {
+                // If the password doesn't match, respond with JSON indicating incorrect password
+                res.json("incorrect");
+            }
+        } else {
+            // If no user found with the provided email, respond with JSON indicating user does not exist
+            res.json("notexist");
+        }
     } catch (error) {
-        // console.log(err)
-        res.json("not exist")
+        // If an error occurs, respond with JSON indicating server error
+        console.error(error);
+        res.status(500).json("server error");
     }
-})
+});
 
 // signup
 
@@ -207,7 +206,7 @@ app.post('/Modify/Subject/add', async (req, res) => {
 //add video 
 
 app.post('/Modify/Video/Add', async (req, res) => {
-    const { subject, unit, source, notesUrl, comment,branch,semester } = req.body;
+    const { subject, unit, source, notesUrl, comment, branch, semester } = req.body;
 
     const data = {
         subject: subject,
@@ -225,7 +224,7 @@ app.post('/Modify/Video/Add', async (req, res) => {
         if (check) {
             // Video with the same source already exists
             return res.json("exist");
-// 
+            // 
         } else {
             // Video does not exist, so insert it
             await vidModel.create(data);
@@ -423,7 +422,28 @@ app.post('/assesment/result', (req, res) => {
     }
 })
 
-//
+// put request 
+
+app.put('/updateStatus/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log(id);
+
+        const filter = { _id: id };
+        const update = { isPlus: true }; // Assuming `isPlus` is the field you want to update
+
+        await UserModel.findByIdAndUpdate(filter, update);
+
+        const updatedUser = await UserModel.findOne(filter);
+        // console.log('Updated user:', updatedUser);
+
+        res.status(200).json("updated");
+    } catch (error) {
+        console.error('Error updating user status:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 
 

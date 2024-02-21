@@ -16,13 +16,12 @@ const { findOne } = require('./models/question')
 const resultModel = require('./models/result')
 const gradeModel = require('./models/grade')
 const unitModel = require('./models/units')
+const resourceModel = require('./models/resources')
 
-const Jwt = require('jsonwebtoken')
-const jwtKey = ('mark')
 
 const app = express()
-// app.use(cors({
 
+// app.use(cors({
 //     origin: ["http://localhost:3000"],
 //     methods: ["POST", "GET"],
 //     credentials: true
@@ -65,6 +64,11 @@ app.get('/branches', (req, res) => {
         .then(users => res.json(users))
         .catch(err => res.json(err))
 })
+app.get('/resources', (req, res) => {
+    resourceModel.find()
+        .then(users => res.json(users))
+        .catch(err => res.json(err))
+})
 app.get('/subjects', (req, res) => {
     subjectModel.find()
         .then(subject => res.json(subject))
@@ -76,33 +80,11 @@ app.get('/unit', (req, res) => {
         .catch(err => res.json(err))
 
 })
-
-app.get('/user', verifyToken, (req, res) => {
-    // Assuming UserModel is your model for users
-    UserModel.findById(req.user.id)
+app.get('/user', (req, res) => {
+    UserModel.find()
         .then(user => res.json(user))
-        .catch(err => res.status(500).json({ error: 'Internal Server Error' }));
-});
-
-function verifyToken(req, res, next) {
-    const bearerHeader = req.headers['authorization'];
-    if (typeof bearerHeader !== 'undefined') {
-        const bearerToken = bearerHeader.split(' ')[1];
-        req.token = bearerToken;
-        jwt.verify(req.token, jwtKey, (err, authData) => {
-            if (err) {
-                res.status(403).json({ error: 'Forbidden' });
-            } else {
-                req.user = authData;
-                next();
-            }
-        });
-    } else {
-        res.status(403).json({ error: 'Forbidden' });
-    }
-}
-
-
+        .catch(err => res.json(err))
+})
 app.get('/subject', (req, res) => {
 
     res.status(200).render('subject.ejs');
@@ -128,30 +110,32 @@ app.get('/profile', (req, res) => {
 
 
 // post only
-
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await UserModel.findOne({ email: email, password: password }); // Corrected query
+        const user = await UserModel.findOne({ email: email });
+
         if (user) {
-            Jwt.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
-                if (err) {
-                    console.error(err);
-                    res.status(500).send({ error: "Internal Server Error" });
-                } else {
-                    res.send({user, auth: token });
-                }
-            });
+            // Check if the password matches
+            if (user.password === password) {
+
+                // Respond with JSON data containing user's information
+                res.json({ auth: true, user: user });
+            } else {
+                // If the password doesn't match, respond with JSON indicating incorrect password
+                res.json("incorrect");
+            }
         } else {
-            res.status(401).json({ error: "Invalid credentials" }); // Unauthorized status
+            // If no user found with the provided email, respond with JSON indicating user does not exist
+            res.json("notexist");
         }
     } catch (error) {
+        // If an error occurs, respond with JSON indicating server error
         console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json("server error");
     }
 });
-
 
 // signup
 
@@ -222,7 +206,7 @@ app.post('/Modify/Subject/add', async (req, res) => {
 //add video 
 
 app.post('/Modify/Video/Add', async (req, res) => {
-    const { subject, unit, source, notesUrl, comment, branch, semester } = req.body;
+    const { subject, unit, source, notesUrl, comment,branch,semester } = req.body;
 
     const data = {
         subject: subject,
@@ -240,7 +224,7 @@ app.post('/Modify/Video/Add', async (req, res) => {
         if (check) {
             // Video with the same source already exists
             return res.json("exist");
-            // 
+// 
         } else {
             // Video does not exist, so insert it
             await vidModel.create(data);
@@ -447,3 +431,14 @@ app.post('/assesment/result', (req, res) => {
 app.listen(port, () => {
     console.log(`server is running on port ${port}`)
 })
+
+// subjectModel.create(data)
+// .then((result) => {
+//     console.log(result);
+//     // res.redirect('/register');
+
+// })
+// .catch((error) => {
+//     console.error(error);
+//     res.status(500).send('Internal Server Error'); // Send an appropriate error response
+// });
