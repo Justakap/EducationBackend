@@ -85,6 +85,12 @@ app.get('/user', (req, res) => {
         .then(user => res.json(user))
         .catch(err => res.json(err))
 })
+app.get('/AssessmentResult', (req, res) => {
+    
+    resultModel.find()
+        .then(user => res.json(user))
+        .catch(err => res.json(err))
+})
 app.get('/subject', (req, res) => {
 
     res.status(200).render('subject.ejs');
@@ -155,18 +161,15 @@ app.post('/signup', async (req, res) => {
         const check = await UserModel.findOne({ email: email })
         if (check) {
             res.json("exist")
-        }
-        else {
-
+        } else {
             res.json("notexist")
             await UserModel.insertMany([data])
-
         }
-
     } catch (error) {
-        // console.log(err)
-        res.json("not exist")
+        console.log(error);  
+        res.json("invalid")
     }
+    
 })
 
 
@@ -427,7 +430,7 @@ app.post('/assesment/result', (req, res) => {
 app.put('/updateStatus/:id', async (req, res) => {
     try {
         const id = req.params.id;
-        console.log(id);
+        // console.log(id);
 
         const filter = { _id: id };
         const update = { isPlus: true }; // Assuming `isPlus` is the field you want to update
