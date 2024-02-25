@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     unique: true // Ensure email is unique
   },
   contact: {
-    type: Number,
+    type: String,
     required: true // Ensure contact is required
   },
   password: {
@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
   isPlus: {
     type: Boolean,
     default: false
+  },
+  image: {
+    type: String,
+
   }
 });
 
