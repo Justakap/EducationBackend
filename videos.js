@@ -17,6 +17,7 @@ const resultModel = require('./models/result')
 const gradeModel = require('./models/grade')
 const unitModel = require('./models/units')
 const resourceModel = require('./models/resources')
+const inboxModel = require('./models/inbox')
 
 
 const app = express()
@@ -85,8 +86,13 @@ app.get('/user', (req, res) => {
         .then(user => res.json(user))
         .catch(err => res.json(err))
 })
+app.get('/Queries', (req, res) => {
+    inboxModel.find()
+        .then(user => res.json(user))
+        .catch(err => res.json(err))
+})
 app.get('/AssessmentResult', (req, res) => {
-    
+
     resultModel.find()
         .then(user => res.json(user))
         .catch(err => res.json(err))
@@ -166,14 +172,39 @@ app.post('/signup', async (req, res) => {
             await UserModel.insertMany([data])
         }
     } catch (error) {
-        console.log(error);  
+        console.log(error);
         res.json("invalid")
     }
-    
+
 })
 
 
 
+// for adding a query 
+app.post('/Queries', async (req, res) => {
+    const { email, subject, message, time } = req.body;
+
+
+    const data = {
+        email: email,
+        subject: subject,
+        message: message,
+
+
+
+    }
+    try {
+        await inboxModel.insertMany([data]);
+        // console.log("Data inserted:", data);
+        res.json("added");
+    } catch (error) {
+        console.error("Error inserting data:", error);
+        res.status(500).json("nadded");
+    }
+
+
+
+})
 // for adding a subject 
 app.post('/Modify/Subject/add', async (req, res) => {
     const { name, semester, image, branch } = req.body;
@@ -446,6 +477,26 @@ app.put('/updateStatus/:id', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+// update inbox diplayed  
+app.put('/setDisplayed/:id', async (req, res) => {
+    try {
+        const id = req.params.id; // Retrieve the ID from the request body
+
+        const filter = { _id: id };
+        const update = { displayed: true };
+
+        await inboxModel.findByIdAndUpdate(filter, update);
+
+        const updatedMessage = await inboxModel.findOne(filter);
+        // console.log('Updated message:', updatedMessage);
+
+        res.status(200).json("updated");
+    } catch (error) {
+        console.error('Error updating message status:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 
 
