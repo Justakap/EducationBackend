@@ -359,6 +359,11 @@ app.get('/assesment', (req, res) => {
         .then(user => res.json(user))
         .catch(err => res.json(err))
 })
+app.get('/LogAssessment/viewResult', (req, res) => {
+    resultModel.find()
+        .then(user => res.json(user))
+        .catch(err => res.json(err))
+})
 app.get('/assesment/addAssesment', (req, res) => {
     assesmentModel.find()
         .then(user => res.json(user))
@@ -430,11 +435,11 @@ app.post('/Modify/Assesment', async (req, res) => {
 //
 
 app.post('/assesment/result', (req, res) => {
-    const { marks, name, currentAssesment, status } = req.body
+    const { marks, user, currentAssesment, status } = req.body
 
     const data = {
         marks: marks,
-        name: name,
+        name: user,
         AssesmentId: currentAssesment,
         status: status,
 
