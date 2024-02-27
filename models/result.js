@@ -4,6 +4,10 @@ const resultSchema = new mongoose.Schema({
     marks: Number,
     AssesmentId: String,
     status: String,
+    time: {
+        type: Date,
+        default: Date.now
+    },
 });
 
 const resultModel = mongoose.model('result', resultSchema);
