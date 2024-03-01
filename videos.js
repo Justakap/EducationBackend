@@ -435,13 +435,15 @@ app.post('/Modify/Assesment', async (req, res) => {
 //
 
 app.post('/assesment/result', (req, res) => {
-    const { marks, user, currentAssesment, status } = req.body
+    const { marks, user, currentAssesment, status,subject,number } = req.body
 
     const data = {
         marks: marks,
         name: user,
         AssesmentId: currentAssesment,
         status: status,
+        subject: subject,
+        number: number,
 
     }
 
