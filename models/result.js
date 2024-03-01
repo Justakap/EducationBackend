@@ -8,6 +8,8 @@ const resultSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    number: String,
+    subject: String,
 });
 
 const resultModel = mongoose.model('result', resultSchema);
