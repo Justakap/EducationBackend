@@ -18,6 +18,7 @@ const gradeModel = require('./models/grade')
 const unitModel = require('./models/units')
 const resourceModel = require('./models/resources')
 const inboxModel = require('./models/inbox')
+const communityModel = require('./models/Community/community')
 
 
 const app = express()
@@ -97,10 +98,33 @@ app.get('/AssessmentResult', (req, res) => {
         .then(user => res.json(user))
         .catch(err => res.json(err))
 })
-app.get('/subject', (req, res) => {
+//  Community GET
 
-    res.status(200).render('subject.ejs');
+app.get('/communities', (req, res) => {
+    communityModel.find()
+        .then(response => res.json(response))
+        .catch(err => res.json(err))
 })
+
+
+app.get('/communities/Dashboard/:name', async (req, res) => {
+    const name = req.params.name;
+
+    const community = await communityModel.find({name: name});
+    try {
+        if (community) {
+            return res.status(200).json(community);
+        } else {
+            return res.status(404).json({ message: "Community not found" });
+        }
+    } catch (err) {
+        console.error("Error fetching community:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+
 app.get('/home', (req, res) => {
 
     if (req.session.username) {
@@ -435,7 +459,7 @@ app.post('/Modify/Assesment', async (req, res) => {
 //
 
 app.post('/assesment/result', (req, res) => {
-    const { marks, user, currentAssesment, status,subject,number } = req.body
+    const { marks, user, currentAssesment, status, subject, number } = req.body
 
     const data = {
         marks: marks,
@@ -503,6 +527,44 @@ app.put('/setDisplayed/:id', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+
+
+
+
+// Community 
+
+
+app.post('/communites', async (req, res) => {
+    const { name, member, primeMember, image, dateCreated, description, tags, category } = req.body
+
+    const data = {
+        name: name,
+        member: member,
+        primeMember: primeMember,
+        image: image,
+        dateCreated: dateCreated,
+        description: description,
+        tags: tags,
+        category: category
+    }
+
+    try {
+        const check = await communityModel.findOne({ name: name })
+        if (check) {
+            res.json("exist")
+        } else {
+            res.json("notexist")
+            await communityModel.insertMany([data])
+        }
+    } catch (error) {
+        console.log(error);
+        res.json("invalid")
+    }
+
+})
+//Community DashBoard
+
 
 
 
