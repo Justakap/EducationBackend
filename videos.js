@@ -18,7 +18,7 @@ const gradeModel = require('./models/grade')
 const unitModel = require('./models/units')
 const resourceModel = require('./models/resources')
 const inboxModel = require('./models/inbox')
-const communityModel = require('./models/Community/community')
+const communityModel = require('./models/community')
 
 
 const app = express()
