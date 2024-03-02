@@ -19,6 +19,7 @@ const unitModel = require('./models/units')
 const resourceModel = require('./models/resources')
 const inboxModel = require('./models/inbox')
 const communityModel = require('./models/community')
+const communityMessageModel = require('./models/communityMessage')
 
 
 const app = express()
@@ -105,12 +106,17 @@ app.get('/communities', (req, res) => {
         .then(response => res.json(response))
         .catch(err => res.json(err))
 })
+app.get('/communities/messages', (req, res) => {
+    communityMessageModel.find()
+        .then(response => res.json(response))
+        .catch(err => res.json(err))
+})
 
 
 app.get('/communities/Dashboard/:name', async (req, res) => {
     const name = req.params.name;
 
-    const community = await communityModel.find({name: name});
+    const community = await communityModel.find({ name: name });
     try {
         if (community) {
             return res.status(200).json(community);
@@ -528,12 +534,7 @@ app.put('/setDisplayed/:id', async (req, res) => {
     }
 });
 
-
-
-
-
 // Community 
-
 
 app.post('/communites', async (req, res) => {
     const { name, member, primeMember, image, dateCreated, description, tags, category } = req.body
@@ -563,13 +564,60 @@ app.post('/communites', async (req, res) => {
     }
 
 })
-//Community DashBoard
+//Community Messages ]
+app.post('/communities/messages', async (req, res) => {
+    const { author, message, communityCell } = req.body
 
+    const data = {
+        author: author,
+        message: message,
+        communityCell: communityCell,
+    }
+    try {
+        const check = await communityModel.findOne({ name: communityCell })
+        if (check) {
+            res.json("sent")
+            await communityMessageModel.insertMany([data])
+            // console.log(data)
+        } else {
+            res.json("notexist")
+        }
+    } catch (error) {
+        console.log(error);
+        res.json("invalid")
+    }
 
+})
 
+// put request
 
+app.put('/communities/:name/add-member', async (req, res) => {
+    const communityId = req.params.name; // Extract the community ID from the request parameters
+    const { newMember } = req.body; // Extract the new member from the request body
 
+    try {
+        const community = await communityModel.findOne({ name: communityId }); // Find the community by ID
+        if (!community) {
+            return res.status(404).json({ error: "Community not found" });
+        }
 
+        // Check if the new member is already in the community
+        if (community.member.includes(newMember)) {
+            return res.status(400).json({ error: "Member already exists in the community" });
+        }
+
+        // Add the new member to the community
+        community.member.push(newMember);
+
+        // Save the updated community
+        await community.save();
+
+        res.json({ message: "New member added to the community", community });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 
 app.listen(port, () => {
